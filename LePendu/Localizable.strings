@@ -2,6 +2,7 @@
 "ICON_RANDOM_WORD" = "randomWord.png";
 "ICON_VIE" = "vie.png";
 "ICON_ENDLESS" = "endless.png";
+"ICON_SCORE" = "score.png";
 
 "WORD_0" = "Football";
 "WORD_1" = "Missile";

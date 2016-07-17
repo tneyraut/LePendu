@@ -20,6 +20,8 @@ class AccueilTableViewController: UITableViewController {
     
     private var endlessMod = false
     
+    private let sauvegarde = NSUserDefaults()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -63,7 +65,7 @@ class AccueilTableViewController: UITableViewController {
         
         shadow.shadowOffset = CGSizeMake(0, 1)
         
-        let buttonPlay = UIBarButtonItem(title:"Play", style:.Plain, target:self, action:#selector(buttonPlayActionListener))
+        let buttonPlay = UIBarButtonItem(title:"Play", style:.Plain, target:self, action:#selector(self.buttonPlayActionListener))
         
         buttonPlay.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor(red:245.0/255.0, green:245.0/255.0, blue:245.0/255.0, alpha:1.0), NSShadowAttributeName: shadow, NSFontAttributeName: UIFont(name:"HelveticaNeue-CondensedBlack", size:21.0)!], forState:UIControlState.Normal)
         
@@ -116,11 +118,39 @@ class AccueilTableViewController: UITableViewController {
     @objc private func switchEndlessModActionListener(sender: UISwitch)
     {
         self.endlessMod = sender.on
+        
+        let shadow = NSShadow()
+        shadow.shadowColor = UIColor(red:0.0, green:0.0, blue:0.0, alpha:0.8)
+        shadow.shadowOffset = CGSizeMake(0, 1)
+        
+        let buttonPlay = UIBarButtonItem(title:"Play", style:.Plain, target:self, action:#selector(self.buttonPlayActionListener))
+        buttonPlay.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor(red:245.0/255.0, green:245.0/255.0, blue:245.0/255.0, alpha:1.0), NSShadowAttributeName: shadow, NSFontAttributeName: UIFont(name:"HelveticaNeue-CondensedBlack", size:21.0)!], forState:UIControlState.Normal)
+        
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target:nil, action:nil)
+        
+        self.navigationController?.toolbar.setItems([flexibleSpace, buttonPlay, flexibleSpace], animated:true)
+        
         if (self.endlessMod)
         {
             self.randomWord = true
+            
+            let scoreButton = UIBarButtonItem(title:"Score", style:.Plain, target:self, action:#selector(self.scoreButtonActionListener))
+            scoreButton.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor(red:245.0/255.0, green:245.0/255.0, blue:245.0/255.0, alpha:1.0), NSShadowAttributeName: shadow, NSFontAttributeName: UIFont(name:"HelveticaNeue-CondensedBlack", size:21.0)!], forState:UIControlState.Normal)
+            
+            self.navigationController?.toolbar.setItems([scoreButton, flexibleSpace, buttonPlay], animated:true)
         }
         self.tableView.reloadData()
+    }
+    
+    @objc private func scoreButtonActionListener()
+    {
+        let scoreTableViewController = ScoreTableViewController(style: .Plain)
+        
+        scoreTableViewController.sauvegarde = self.sauvegarde
+        
+        scoreTableViewController.nombreDeVie = self.vie
+        
+        self.navigationController?.pushViewController(scoreTableViewController, animated:true)
     }
     
     private func getUserText() -> String
@@ -142,6 +172,36 @@ class AccueilTableViewController: UITableViewController {
             }
         }
         return resultat
+    }
+    
+    internal func endlessGameIsFinished(nombreDeVieInitiale: Int, score: Int)
+    {
+        if (score < 1)
+        {
+            return
+        }
+        if (self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)) < 10)
+        {
+            self.sauvegarde.setInteger(self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)) + 1, forKey:"numberOfScoresForN°" + String(nombreDeVieInitiale))
+        }
+        
+        var i = 0
+        while (i < self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)))
+        {
+            if (self.sauvegarde.integerForKey("scoreN°" + String(i) + "ForN°" + String(nombreDeVieInitiale)) < score)
+            {
+                var j = self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)) - 1
+                while (j > i)
+                {
+                    self.sauvegarde.setInteger(self.sauvegarde.integerForKey("scoreN°" + String(j - 1) + "ForN°" + String(nombreDeVieInitiale)), forKey:"scoreN°" + String(j) + "ForN°" + String(nombreDeVieInitiale))
+                    j -= 1
+                }
+                self.sauvegarde.setInteger(score, forKey:"scoreN°" + String(i) + "ForN°" + String(nombreDeVieInitiale))
+                self.sauvegarde.synchronize()
+                break
+            }
+            i += 1
+        }
     }
 
     // MARK: - Table view data source

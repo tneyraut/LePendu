@@ -19,12 +19,20 @@ class GameCollectionViewController: UICollectionViewController {
     
     internal var endlessMod = false
     
+    internal var accueilTableViewController = AccueilTableViewController()
+    
+    private var nombreDeVieInitiale = 0
+    
+    private var score = 0
+    
     private let itemsArray: Array = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.title = "Vie : " + String(self.vie)
+        
+        self.nombreDeVieInitiale = self.vie
         
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         
@@ -115,6 +123,7 @@ class GameCollectionViewController: UICollectionViewController {
         let alertAction = UIAlertAction(title:"OK", style:.Default) { (_) in
             if (self.endlessMod)
             {
+                self.score += 1
                 self.vie += 1
                 self.title = "Vie : " + String(self.vie)
                 self.reponse = self.getRandomWord()
@@ -136,8 +145,19 @@ class GameCollectionViewController: UICollectionViewController {
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
         if (self.vie < 0)
         {
-            let alertController = UIAlertController(title:"Défaite", message:"Vous avez fait trop de fautes, le mot était : " + self.reponse, preferredStyle:.Alert)
-            let alertAction = UIAlertAction(title:"OK", style:.Default) { (_) in self.navigationController?.popViewControllerAnimated(true) }
+            var message = "Vous avez fait trop de fautes, le mot était : " + self.reponse + "."
+            if (self.endlessMod)
+            {
+                message = message + " Vous avez marqué " + String(self.score) + " point(s)."
+            }
+            let alertController = UIAlertController(title:"Défaite", message:message, preferredStyle:.Alert)
+            let alertAction = UIAlertAction(title:"OK", style:.Default) { (_) in
+                if (self.endlessMod)
+                {
+                    self.accueilTableViewController.endlessGameIsFinished(self.nombreDeVieInitiale, score:self.score)
+                }
+                self.navigationController?.popViewControllerAnimated(true)
+            }
             alertController.addAction(alertAction)
             self.presentViewController(alertController, animated:true, completion:nil)
         }
