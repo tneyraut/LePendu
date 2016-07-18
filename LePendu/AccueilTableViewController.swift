@@ -73,6 +73,14 @@ class AccueilTableViewController: UITableViewController {
         
         self.navigationController?.toolbar.setItems([flexibleSpace, buttonPlay, flexibleSpace], animated:true)
         
+        if (self.endlessMod)
+        {
+            let scoreButton = UIBarButtonItem(title:"Score", style:.Plain, target:self, action:#selector(self.scoreButtonActionListener))
+            scoreButton.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor(red:245.0/255.0, green:245.0/255.0, blue:245.0/255.0, alpha:1.0), NSShadowAttributeName: shadow, NSFontAttributeName: UIFont(name:"HelveticaNeue-CondensedBlack", size:21.0)!], forState:UIControlState.Normal)
+            
+            self.navigationController?.toolbar.setItems([flexibleSpace, scoreButton, flexibleSpace, buttonPlay, flexibleSpace], animated:true)
+        }
+        
         super.viewDidAppear(animated)
     }
     
@@ -137,7 +145,7 @@ class AccueilTableViewController: UITableViewController {
             let scoreButton = UIBarButtonItem(title:"Score", style:.Plain, target:self, action:#selector(self.scoreButtonActionListener))
             scoreButton.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor(red:245.0/255.0, green:245.0/255.0, blue:245.0/255.0, alpha:1.0), NSShadowAttributeName: shadow, NSFontAttributeName: UIFont(name:"HelveticaNeue-CondensedBlack", size:21.0)!], forState:UIControlState.Normal)
             
-            self.navigationController?.toolbar.setItems([scoreButton, flexibleSpace, buttonPlay], animated:true)
+            self.navigationController?.toolbar.setItems([flexibleSpace, scoreButton, flexibleSpace, buttonPlay, flexibleSpace], animated:true)
         }
         self.tableView.reloadData()
     }
@@ -183,6 +191,12 @@ class AccueilTableViewController: UITableViewController {
         if (self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)) < 10)
         {
             self.sauvegarde.setInteger(self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)) + 1, forKey:"numberOfScoresForN°" + String(nombreDeVieInitiale))
+        }
+        if (self.sauvegarde.integerForKey("numberOfScoresForN°" + String(nombreDeVieInitiale)) == 1)
+        {
+            self.sauvegarde.setInteger(score, forKey:"scoreN°0ForN°" + String(nombreDeVieInitiale))
+            self.sauvegarde.synchronize()
+            return
         }
         
         var i = 0

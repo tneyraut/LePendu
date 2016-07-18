@@ -66,6 +66,8 @@ class ScoreTableViewController: UITableViewController {
             
             cell.textLabel?.text = "Aucun score enregistré"
             
+            cell.textLabel?.textAlignment = .Center
+            
             return cell
         }
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath)
